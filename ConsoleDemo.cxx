@@ -84,7 +84,7 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   CTestDataset seqImg;
 
-  cv::Mat scaledDepth(g_depth.rows * 2, g_depth.cols * 2, CV_16S);
+  cv::Mat scaledDepth(g_depth.rows * 2, g_depth.cols * 2, CV_16UC1);
 
   cv::resize(g_depth, scaledDepth, scaledDepth.size());
 
@@ -418,7 +418,7 @@ int main(int argc, char* argv[])
   // init image
   //g_color = cv::Mat(720, 1280, CV_8UC3);
   g_color = cv::Mat(480, 640, CV_8UC3);
-  g_depth = cv::Mat(240, 320, CV_16U);
+  g_depth = cv::Mat(240, 320, CV_16UC1);
 
   // We are only interested in the first device
   if (da.size() >= 1)
