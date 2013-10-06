@@ -100,8 +100,8 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
   if(key == 't'){
 
     stringstream ss_c, ss_d;
-    ss_c << "color_" << imageNum << ".png" << endl;
-    ss_d << "depth_" << imageNum << ".png" << endl;
+    ss_c << "color_" << imageNum << ".png";
+    ss_d << "depth_" << imageNum << ".png";
 
     cv::imwrite(ss_c.str(), g_color);
     cv::imwrite(ss_d.str(), g_depth);
