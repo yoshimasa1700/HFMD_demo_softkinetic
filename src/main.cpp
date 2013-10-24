@@ -35,6 +35,8 @@
 #include <HFMD_core/util.h>
 #include <HFMD_core/CDataset.h>
 
+#include <gflags/gflags.h>
+
 using namespace DepthSense;
 using namespace std;
 
@@ -58,6 +60,9 @@ cv::Mat g_depth,g_color;
 
 CRForest *g_forest;
 
+#define MAX_DEPTH 1000
+#define MIN_DEPTH 0
+
 /*----------------------------------------------------------------------------*/
 // New audio sample event handler
 // void onNewAudioSample(AudioNode node, AudioNode::NewSampleReceivedData data)
@@ -78,7 +83,6 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   memcpy(g_color.data, data.colorMap, data.colorMap.size());
 
-  cv::imshow("color", g_color);
   
   int key = cv::waitKey(1);
 
@@ -88,10 +92,16 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   cv::resize(g_depth, scaledDepth, scaledDepth.size());
 
-  cv::imshow("depth", scaledDepth);
-
   seqImg.img.push_back(&g_color);
   seqImg.img.push_back(&scaledDepth);
+
+  cv::Mat maxDist = cv::Mat::ones(g_color.rows , g_color.cols , CV_16UC1) * MAX_DEPTH;
+  cv::Mat minDist = cv::Mat::ones(g_color.rows , g_color.cols , CV_16UC1) * MIN_DEPTH;
+  cv::resize(g_depth, scaledDepth, cv::Size(), 2.0,2.0);
+  cv::min(scaledDepth, maxDist, scaledDepth);
+  scaledDepth -= minDist;
+  scaledDepth.convertTo(scaledDepth, CV_8UC1, 255.0 / (MAX_DEPTH - MIN_DEPTH));
+
 
   CDetectionResult detectR;
 
@@ -110,6 +120,12 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
   }else if(key == 'q'){
     g_context.quit();    
   }
+
+  cv::imshow("color", g_color);
+  cv::imshow("depth", scaledDepth);
+  
+  key = cv::waitKey(1);
+
   g_cFrames++;
 }
 
@@ -381,7 +397,7 @@ int main(int argc, char* argv[])
   //check argument
   if(argc < 2) {
     cout << "Usage: ./learning [config.xml]"<< endl;
-    conf.loadConfig("hfConfig.xml");
+    conf.loadConfig("config.xml");
   } else
     conf.loadConfig(argv[1]);
 
