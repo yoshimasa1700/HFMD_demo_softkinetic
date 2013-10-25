@@ -28,7 +28,7 @@ LINK_DIRECTORIES("/usr/local/lib")
 LINK_DIRECTORIES("/usr/lib")
 LINK_DIRECTORIES("/opt/softkinetic/DepthSenseSDK/lib")
 
-ADD_EXECUTABLE(HFMD_demo_DS325 ./src/main.cpp)
+ADD_EXECUTABLE(HFMD_demo_DS325 ./src/main.cpp ./src/CCalibDS325.cpp)
 TARGET_LINK_LIBRARIES(HFMD_demo_DS325 HFMD_core 
 				      ${Boost_LIBRARIES} 
 				      DepthSense 

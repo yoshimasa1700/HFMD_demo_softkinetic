@@ -37,6 +37,8 @@
 
 #include <gflags/gflags.h>
 
+#include "./CCalibDS325.h"
+
 using namespace DepthSense;
 using namespace std;
 
@@ -59,6 +61,8 @@ int imageNum = 0;
 cv::Mat g_depth,g_color;
 
 CRForest *g_forest;
+
+CCalibDS325 *g_calib;
 
 #define MAX_DEPTH 1000
 #define MIN_DEPTH 0
@@ -88,24 +92,30 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   CTestDataset seqImg;
 
-  cv::Mat scaledDepth(g_depth.rows * 2, g_depth.cols * 2, CV_16UC1);
+  cv::Mat scaledDepth;//(g_depth.rows * 2, g_depth.cols * 2, CV_16UC1);
 
-  cv::resize(g_depth, scaledDepth, scaledDepth.size());
+  //cv::resize(g_depth, scaledDepth, scaledDepth.size());
 
+  g_calib->calib(g_color, g_depth, g_color, scaledDepth);
+
+  std::cout << g_depth.size() << std::endl;
   seqImg.img.push_back(&g_color);
   seqImg.img.push_back(&scaledDepth);
 
-  cv::Mat maxDist = cv::Mat::ones(g_color.rows , g_color.cols , CV_16UC1) * MAX_DEPTH;
-  cv::Mat minDist = cv::Mat::ones(g_color.rows , g_color.cols , CV_16UC1) * MIN_DEPTH;
-  cv::resize(g_depth, scaledDepth, cv::Size(), 2.0,2.0);
-  cv::min(scaledDepth, maxDist, scaledDepth);
-  scaledDepth -= minDist;
-  scaledDepth.convertTo(scaledDepth, CV_8UC1, 255.0 / (MAX_DEPTH - MIN_DEPTH));
+  // cv::Mat maxDist = cv::Mat::ones(g_color.rows , g_color.cols , CV_16UC1) * MAX_DEPTH;
+  // cv::Mat minDist = cv::Mat::ones(g_color.rows , g_color.cols , CV_16UC1) * MIN_DEPTH;
+  // cv::resize(g_depth, scaledDepth, cv::Size(), 2.0,2.0);
+  // cv::min(scaledDepth, maxDist, scaledDepth);
+  // scaledDepth -= minDist;
+  // scaledDepth.convertTo(scaledDepth, CV_8UC1, 255.0 / (MAX_DEPTH - MIN_DEPTH));
 
+  
 
   CDetectionResult detectR;
 
   detectR = g_forest->detection(seqImg);
+
+  std::cout << g_depth.size() << std::endl;
 
   if(key == 't'){
 
@@ -121,9 +131,13 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
     g_context.quit();    
   }
 
+  
+
   cv::imshow("color", g_color);
   cv::imshow("depth", scaledDepth);
   
+  std::cout << "kokokoko" << std::endl;
+
   key = cv::waitKey(1);
 
   g_cFrames++;
@@ -414,6 +428,10 @@ int main(int argc, char* argv[])
 
   g_forest->loadForest();
 
+  g_calib = new CCalibDS325;
+
+  g_calib->loadParameters("intrinsics.yml", "extrinsics.yml");
+
   //create tree direct
   //string opath(conf.outpath);
   //std::cout << "kokomade kitayo" << std::endl;
@@ -471,6 +489,9 @@ int main(int argc, char* argv[])
 
   if (g_forest)
     delete g_forest;
+
+  if (g_calib)
+    delete g_calib;
 
   return 0;
 }
