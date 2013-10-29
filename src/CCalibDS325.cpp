@@ -57,7 +57,7 @@ int CCalibDS325::calib(cv::Mat &colorSrc, cv::Mat &depthSrc, cv::Mat &colorDest,
   cv::min(scaledDepth, maxDist, scaledDepth);
 
   scaledDepth -= minDist;
-  scaledDepth.convertTo(scaledDepth, CV_8UC1, 255.0 / (MAX_DEPTH - MIN_DEPTH));
+  //scaledDepth.convertTo(scaledDepth, CV_16UC1, 255.0 / (MAX_DEPTH - MIN_DEPTH));
  
   //colorSrc.copyTo(colorDest);
   //scaledDepth.copyTo(depthDest);

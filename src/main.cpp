@@ -64,8 +64,6 @@ CRForest *g_forest;
 
 CCalibDS325 *g_calib;
 
-#define MAX_DEPTH 1000
-#define MIN_DEPTH 0
 
 /*----------------------------------------------------------------------------*/
 // New audio sample event handler
@@ -131,12 +129,15 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
     g_context.quit();    
   }
 
-  
+  cv::Mat showDepth;
+  scaledDepth.convertTo(showDepth, CV_8UC1, 255.0 / (MAX_DEPTH));
+
+  cv::circle(showDepth, cv::Point(320, 240), 5, cv::Scalar(0,0,0), 5);
+
 
   cv::imshow("color", g_color);
-  cv::imshow("depth", scaledDepth);
+  cv::imshow("depth", showDepth);
   
-  std::cout << "kokokoko" << std::endl;
 
   key = cv::waitKey(1);
 
@@ -354,6 +355,10 @@ void configureNode(Node node)
 
   cv::namedWindow("color");
   cv::namedWindow("depth");
+
+  cv::namedWindow("vote");
+
+  //  cv::namedWindow("test");
 
   // if ((node.is<AudioNode>())&&(!g_anode.isSet()))
   // {

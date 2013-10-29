@@ -13,7 +13,7 @@
   <!-- extract patch ratio -->
   <patchratio>1000</patchratio>
   <!-- Stride -->
-  <stride>5</stride>
+  <stride>10</stride>
   <!-- Train image per tree -->
   <trainimagepertree>30</trainimagepertree>
   <!-- min sample number -->
@@ -57,7 +57,7 @@
   <classdatabasename>classDatabase</classdatabasename>
 
   <!--<mindistance>350</mindistance>-->
-  <mindistance>350</mindistance>
+  <mindistance>0</mindistance>
   <maxdistance>1000</maxdistance>
 
   <modellistfolder>models</modellistfolder>
