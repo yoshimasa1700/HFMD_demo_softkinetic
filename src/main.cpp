@@ -113,6 +113,8 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   detectR = g_forest->detection(seqImg);
 
+  cv::circle(g_color, detectR.detectedClass[0].centerPoint, 10, cv::Scalar(0,0,255),5);
+
   std::cout << g_depth.size() << std::endl;
 
   if(key == 't'){
