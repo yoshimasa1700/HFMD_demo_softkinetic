@@ -13,7 +13,7 @@
   <!-- extract patch ratio -->
   <patchratio>10000</patchratio>
   <!-- Stride -->
-  <stride>3</stride>
+  <stride>5</stride>
   <!-- Train image per tree -->
   <trainimagepertree>59</trainimagepertree>
   <!-- min sample number -->
