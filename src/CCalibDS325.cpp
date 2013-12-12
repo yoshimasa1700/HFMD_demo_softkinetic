@@ -49,7 +49,7 @@ int CCalibDS325::loadParameters(std::string inName, std::string exName){
 int CCalibDS325::calib(cv::Mat &colorSrc, cv::Mat &depthSrc, cv::Mat &colorDest, cv::Mat &depthDest){
   
   std::cout << depthSrc.size() << std::endl;
-  cv::Mat scaledDepth(640, 480, CV_16UC1);
+  cv::Mat scaledDepth;//(640, 480, CV_16UC1);
   cv::Mat maxDist = cv::Mat::ones(depthSrc.rows * 2, depthSrc.cols * 2, CV_16U) * MAX_DEPTH;
   cv::Mat minDist = cv::Mat::ones(depthSrc.rows * 2, depthSrc.cols * 2, CV_16U) * MIN_DEPTH;
 
@@ -70,12 +70,36 @@ int CCalibDS325::calib(cv::Mat &colorSrc, cv::Mat &depthSrc, cv::Mat &colorDest,
 
   // return 0;
   
-
-  
+  //cv::Mat R1, R2, P1, P2, Q;
+  stereoRectify(cameraMatrix[0], distCoeffs[0],
+                  cameraMatrix[1], distCoeffs[1],
+		colorDest.size(), R, T, R1, R2, P1, P2, Q,
+		cv::CALIB_ZERO_DISPARITY, 1, colorDest.size(), &validRoi[0], &validRoi[1]);
 
     
 
   // cv::resize(scaledDepth, scaledDepth, cv::Size(), 2.0,2.0);
+
+   cv::initUndistortRectifyMap(
+			      cameraMatrix[0], 
+			      distCoeffs[0], 
+			      R1, 
+			      P1, 
+			      colorSrc.size(), 
+			      CV_16SC2, 
+			      rmap[0][0], rmap[0][1]
+			      );
+  cv::initUndistortRectifyMap(
+			      cameraMatrix[1], 
+			      distCoeffs[1], 
+			      R2, 
+			      P2, 
+			      colorSrc.size(), 
+			      CV_16SC2, 
+			      rmap[1][0], 
+			      rmap[1][1]
+			      );
+
 
   cv::initUndistortRectifyMap(cameraMatrix[0], distCoeffs[0], R1, P1, colorSrc.size(), CV_16SC2, rmap[0][0], rmap[0][1]);
   cv::initUndistortRectifyMap(cameraMatrix[1], distCoeffs[1], R1, P2, colorSrc.size(), CV_16SC2, rmap[1][0], rmap[1][1]);
@@ -87,41 +111,52 @@ int CCalibDS325::calib(cv::Mat &colorSrc, cv::Mat &depthSrc, cv::Mat &colorDest,
 
   {
     cv::Mat img = colorSrc.clone(), rimg, cimg;
-    //cv::remap(img, rimg, rmap[k][0], rmap[k][1], CV_INTER_LINEAR);
-    undistort(img, cimg, cameraMatrix[0], distCoeffs[0]);
-    cimg.copyTo(colorDest);
+    cv::remap(img, cimg, rmap[0][0], rmap[0][1], CV_INTER_LINEAR);
+    //undistort(img, cimg, cameraMatrix[0], distCoeffs[0]);
+    cv::Mat resizeC;
+    cv::resize(cimg(validRoi[0]), resizeC, cv::Size(640,480));
+
+    resizeC.copyTo(colorDest);
 
     //cv::cvtColor(cimg, cimg, CV_GRAY2BGR);
     //cv::Rect roi(0,0,w,h);
     //std::cout << roi << std::endl;
 
-    cv::Mat canvasPart = canvas(cv::Rect(0, 0, w,h));
-    cv::resize(cimg, canvasPart, canvasPart.size(), 0, 0, CV_INTER_AREA);
-    cv::Rect vroi(cvRound(validRoi[0].x*sf), cvRound(validRoi[0].y*sf),
-  		  cvRound(validRoi[0].width*sf), cvRound(validRoi[0].height*sf));
-    cv::rectangle(canvasPart, vroi, cv::Scalar(0,0,255), 3, 8);
+    // cv::Mat canvasPart = canvas(cv::Rect(0, 0, w,h));
+    // cv::resize(cimg, canvasPart, canvasPart.size(), 0, 0, CV_INTER_AREA);
+    // cv::Rect vroi(cvRound(validRoi[0].x*sf), cvRound(validRoi[0].y*sf),
+    // 		  cvRound(validRoi[0].width*sf), cvRound(validRoi[0].height*sf));
+    // cv::rectangle(canvasPart, vroi, cv::Scalar(0,0,255), 3, 8);
 
   }
   {
     cv::Mat img = scaledDepth.clone(), rimg, cimg;
     //cv::remap(img, img, rmap[k][0], rmap[k][1], CV_INTER_LINEAR);
-    undistort(img, rimg, cameraMatrix[1], distCoeffs[1]);
+    //    undistort(img, rimg, cameraMatrix[1], distCoeffs[1]);
     //rimg.copyTo(depthDest);
     
     
 
-    cvtColor(rimg, cimg, CV_GRAY2BGR);
+    cvtColor(img, cimg, CV_GRAY2BGR);
 
-    std::cout << "kokoke?" << std::endl;
     cv::Mat depthPart = cimg(cv::Rect(40, 43,498,498 / 4 * 3));
     cv::Mat rescale;
     cv::resize(depthPart, rescale, cv::Size(640, 480));
+    cv::remap(rescale, rimg, rmap[1][0], rmap[1][1], CV_INTER_LINEAR);
+    
+    cvtColor(rimg(validRoi[1]), depthDest,CV_RGB2GRAY,1);
+    cv::resize(depthDest, depthDest, cv::Size(640,480));
+    depthDest.convertTo(depthDest, 1000.0 / 255.0, CV_16UC1);
 
-    rescale.copyTo(depthDest);
-    cvtColor(depthDest, depthDest,CV_RGB2GRAY,1);
+
     //    depthDest.convertTo(depthDest,1.0,CV_16UC1);
     std::cout << depthDest.type() << " " << CV_64FC1	<< std::endl;
    
+
+    // cv::namedWindow("a");
+    // cv::namedWindow("b");
+
+    // cv::imshow("a", )
 
     // cv::Mat canvasPart = canvas(cv::Rect(w * 1, 0, w, h));
     // cv::resize(depthPart, canvasPart, canvasPart.size(), 0, 0, CV_INTER_AREA);
