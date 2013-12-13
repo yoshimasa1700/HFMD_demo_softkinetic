@@ -76,7 +76,7 @@ CCalibDS325 *g_calib;
 /*----------------------------------------------------------------------------*/
 // New color sample event handler
 void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
-  printf("C#%u: %d\n",g_cFrames,data.colorMap.size());
+  // printf("C#%u: %d\n",g_cFrames,data.colorMap.size());
   //*data.colorMap;
   //data.colorMap
 
@@ -96,18 +96,9 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   g_calib->calib(g_color, g_depth, g_color, scaledDepth);
 
-  std::cout << g_depth.size() << std::endl;
+  //  std::cout << g_depth.size() << std::endl;
   seqImg.img.push_back(&g_color);
   seqImg.img.push_back(&scaledDepth);
-
-  // cv::Mat maxDist = cv::Mat::ones(g_color.rows , g_color.cols , CV_16UC1) * MAX_DEPTH;
-  // cv::Mat minDist = cv::Mat::ones(g_color.rows , g_color.cols , CV_16UC1) * MIN_DEPTH;
-  // cv::resize(g_depth, scaledDepth, cv::Size(), 2.0,2.0);
-  // cv::min(scaledDepth, maxDist, scaledDepth);
-  // scaledDepth -= minDist;
-  // scaledDepth.convertTo(scaledDepth, CV_8UC1, 255.0 / (MAX_DEPTH - MIN_DEPTH));
-
-  
 
   CDetectionResult detectR;
 
@@ -115,27 +106,27 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   cv::circle(g_color, detectR.detectedClass[0].centerPoint, 10, cv::Scalar(0,0,255),5);
 
-  std::cout << g_depth.size() << std::endl;
+  //  std::cout << g_depth.size() << std::endl;
 
-  if(key == 't'){
+  // if(key == 't'){
 
-    stringstream ss_c, ss_d;
-    ss_c << "color_" << imageNum << ".png";
-    ss_d << "depth_" << imageNum << ".png";
+  //   stringstream ss_c, ss_d;
+  //   ss_c << "color_" << imageNum << ".png";
+  //   ss_d << "depth_" << imageNum << ".png";
 
-    cv::imwrite(ss_c.str(), g_color);
-    cv::imwrite(ss_d.str(), g_depth);
+  //   cv::imwrite(ss_c.str(), g_color);
+  //   cv::imwrite(ss_d.str(), g_depth);
 
-    imageNum++;
-  }else if(key == 'q'){
+  //   imageNum++;
+  // }else
+    if(key == 'q'){
     g_context.quit();    
   }
 
   cv::Mat showDepth;
   scaledDepth.convertTo(showDepth, CV_8UC1, 255.0 / (MAX_DEPTH));
 
-  cv::circle(showDepth, cv::Point(320, 240), 5, cv::Scalar(0,0,0), 5);
-
+  //  cv::circle(showDepth, cv::Point(320, 240), 5, cv::Scalar(0,0,0), 5);
 
   cv::imshow("color", g_color);
   cv::imshow("depth", showDepth);
@@ -186,7 +177,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
   // }
   g_dFrames++;
 
-  printf("Z2#: %d\n", g_depth.cols * g_depth.rows * g_depth.channels());
+  //  printf("Z2#: %d\n", g_depth.cols * g_depth.rows * g_depth.channels());
   //printf("C3: %d\n", sizeof(*g_color.data));
 
   memcpy(g_depth.data, data.depthMap, data.depthMap.size()*2);

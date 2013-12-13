@@ -7,24 +7,24 @@
 class CCalibDS325{
  public:
   CCalibDS325(){
-/* cv::namedWindow("a");
-   cv::namedWindow("b");*/
-}
+    /* cv::namedWindow("a");
+       cv::namedWindow("b");*/
+  }
   ~CCalibDS325(){
-//cv::destroyAllWindows();
-}
+    //cv::destroyAllWindows();
+  }
 
-int loadParameters(std::string inName, std::string exName);
-int calib(cv::Mat &colorSrc, cv::Mat &depthSrc, cv::Mat &colorDest, cv::Mat &depthDest);
+  int loadParameters(std::string inName, std::string exName);
+  int calib(cv::Mat &colorSrc, cv::Mat &depthSrc, cv::Mat &colorDest, cv::Mat &depthDest);
 
-private:
-cv::Mat cameraMatrix[2], distCoeffs[2], 
-  R, T, R1, R2, P1, P2, Q, F, 
-  rmap[2][2];
+ private:
+  cv::Mat cameraMatrix[2], distCoeffs[2], 
+    R, T, R1, R2, P1, P2, Q, F, 
+    rmap[2][2];
   
-cv::Rect validRoi[2];
+  cv::Rect validRoi[2];
 
-cv::Mat canvas;
-double sf;
-int w, h;
+  cv::Mat canvas;
+  double sf;
+  int w, h;
 };
