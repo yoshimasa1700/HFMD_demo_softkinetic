@@ -26,6 +26,7 @@
 #include <vector>
 #include <exception>
 #include <string>
+#include <sstream>
 
 #include <DepthSense.hxx>
 
@@ -63,6 +64,10 @@ cv::Mat g_depth,g_color;
 CRForest *g_forest;
 
 CCalibDS325 *g_calib;
+
+int face[] = {cv::FONT_HERSHEY_SIMPLEX, cv::FONT_HERSHEY_PLAIN, cv::FONT_HERSHEY_DUPLEX, cv::FONT_HERSHEY_COMPLEX, 
+		  cv::FONT_HERSHEY_TRIPLEX, cv::FONT_HERSHEY_COMPLEX_SMALL, cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 
+		  cv::FONT_HERSHEY_SCRIPT_COMPLEX, cv::FONT_ITALIC};
 
 
 /*----------------------------------------------------------------------------*/
@@ -104,7 +109,30 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   detectR = g_forest->detection(seqImg);
 
-  cv::circle(g_color, detectR.detectedClass[0].centerPoint, 10, cv::Scalar(0,0,255),5);
+
+  for(uint i = 0; i < detectR.detectedClass.size();++i){
+    if(detectR.detectedClass[i].score > 0.01){
+    cv::Scalar color(120*(i+3)%3, 120*(i+2)%3,120*(i+1)%3);
+    cv::circle(g_color, detectR.detectedClass[i].centerPoint, 5, color,2);
+    cv::putText(g_color, 
+		detectR.detectedClass[i].name, 
+		detectR.detectedClass[i].centerPoint + cv::Point(0,30), 
+		face[4]|face[8], 
+		0.8, 
+		color, 2, CV_AA);
+
+    std::stringstream ss;
+    ss << detectR.detectedClass[i].score;
+    cv::putText(g_color, 
+		ss.str(),
+		detectR.detectedClass[i].centerPoint + cv::Point(0,60), 
+		face[4]|face[8], 
+		0.8, 
+		color, 2, CV_AA);
+    }
+  }
+
+  
 
   //  std::cout << g_depth.size() << std::endl;
 
@@ -350,6 +378,8 @@ void configureNode(Node node)
   cv::namedWindow("depth");
 
   cv::namedWindow("vote");
+  cv::namedWindow("hanabi2");
+
 
   //  cv::namedWindow("test");
 
