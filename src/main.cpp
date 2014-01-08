@@ -66,8 +66,8 @@ CRForest *g_forest;
 CCalibDS325 *g_calib;
 
 int face[] = {cv::FONT_HERSHEY_SIMPLEX, cv::FONT_HERSHEY_PLAIN, cv::FONT_HERSHEY_DUPLEX, cv::FONT_HERSHEY_COMPLEX, 
-		  cv::FONT_HERSHEY_TRIPLEX, cv::FONT_HERSHEY_COMPLEX_SMALL, cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 
-		  cv::FONT_HERSHEY_SCRIPT_COMPLEX, cv::FONT_ITALIC};
+	      cv::FONT_HERSHEY_TRIPLEX, cv::FONT_HERSHEY_COMPLEX_SMALL, cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 
+	      cv::FONT_HERSHEY_SCRIPT_COMPLEX, cv::FONT_ITALIC};
 
 
 /*----------------------------------------------------------------------------*/
@@ -100,6 +100,8 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
   //cv::resize(g_depth, scaledDepth, scaledDepth.size());
 
   g_calib->calib(g_color, g_depth, g_color, scaledDepth);
+  
+  //  cv::GaussianBlur(scaledDepth,scaledDepth, cv::Size(21,21),0);
 
   //  std::cout << g_depth.size() << std::endl;
   seqImg.img.push_back(&g_color);
@@ -109,47 +111,49 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   detectR = g_forest->detection(seqImg);
 
+  if(key == 't'){
+
+    stringstream ss_c, ss_d;
+    ss_c << "color_" << imageNum << ".png";
+    ss_d << "depth_" << imageNum << ".png";
+
+    cv::imwrite(ss_c.str(), g_color);
+    cv::imwrite(ss_d.str(), scaledDepth);
+
+    imageNum++;
+  }else
+    if(key == 'q'){
+      g_context.quit();    
+    }
 
   for(uint i = 0; i < detectR.detectedClass.size();++i){
-    if(detectR.detectedClass[i].score > 0.01){
-    cv::Scalar color(120*(i+3)%3, 120*(i+2)%3,120*(i+1)%3);
-    cv::circle(g_color, detectR.detectedClass[i].centerPoint, 5, color,2);
-    cv::putText(g_color, 
-		detectR.detectedClass[i].name, 
-		detectR.detectedClass[i].centerPoint + cv::Point(0,30), 
-		face[4]|face[8], 
-		0.8, 
-		color, 2, CV_AA);
+     if(detectR.detectedClass[i].score > 0.0){
+      cv::Scalar color((i+1)*130%255, (i+2)*130%255,i*130%255);
+    
+      cv::circle(g_color, detectR.detectedClass[i].centerPoint, 5, color,2);
+      cv::putText(g_color, 
+		  detectR.detectedClass[i].name, 
+		  detectR.detectedClass[i].centerPoint + cv::Point(0,30), 
+		  face[4]|face[8], 
+		  0.8, 
+		  color, 2, CV_AA);
 
-    std::stringstream ss;
-    ss << detectR.detectedClass[i].score;
-    cv::putText(g_color, 
-		ss.str(),
-		detectR.detectedClass[i].centerPoint + cv::Point(0,60), 
-		face[4]|face[8], 
-		0.8, 
-		color, 2, CV_AA);
-    }
+      std::stringstream ss;
+      ss << detectR.detectedClass[i].score;
+      cv::putText(g_color, 
+		  ss.str(),
+		  detectR.detectedClass[i].centerPoint + cv::Point(0,60), 
+		  face[4]|face[8], 
+		  0.8, 
+		  color, 2, CV_AA);
+       }
   }
 
   
 
-  //  std::cout << g_depth.size() << std::endl;
+  //   std::cout << g_depth.size() << std::endl;
 
-  // if(key == 't'){
 
-  //   stringstream ss_c, ss_d;
-  //   ss_c << "color_" << imageNum << ".png";
-  //   ss_d << "depth_" << imageNum << ".png";
-
-  //   cv::imwrite(ss_c.str(), g_color);
-  //   cv::imwrite(ss_d.str(), g_depth);
-
-  //   imageNum++;
-  // }else
-    if(key == 'q'){
-    g_context.quit();    
-  }
 
   cv::Mat showDepth;
   scaledDepth.convertTo(showDepth, CV_8UC1, 255.0 / (MAX_DEPTH));

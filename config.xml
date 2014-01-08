@@ -3,17 +3,17 @@
   <!-- Path to trees -->
   <treepath>./trees/treetable</treepath>
   <!-- Number of trees -->
-  <ntree>20</ntree>
+  <ntree>100</ntree>
 
   <!-- Patch width -->
-  <pwidth>20</pwidth>
+  <pwidth>30</pwidth>
   <!-- Patch height -->
-  <pheight>20</pheight>
+  <pheight>30</pheight>
 
   <!-- extract patch ratio -->
   <patchratio>10000</patchratio>
   <!-- Stride -->
-  <stride>20</stride>
+  <stride>10</stride>
   <!-- Train image per tree -->
   <trainimagepertree>59</trainimagepertree>
   <!-- min sample number -->
@@ -58,7 +58,7 @@
 
   <!--<mindistance>350</mindistance>-->
   <mindistance>0</mindistance>
-  <maxdistance>1000</maxdistance>
+  <maxdistance>1024</maxdistance>
 
   <modellistfolder>models</modellistfolder>
   <modellistname>models.txt</modellistname>
