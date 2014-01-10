@@ -81,29 +81,13 @@ int face[] = {cv::FONT_HERSHEY_SIMPLEX, cv::FONT_HERSHEY_PLAIN, cv::FONT_HERSHEY
 /*----------------------------------------------------------------------------*/
 // New color sample event handler
 void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
-  // printf("C#%u: %d\n",g_cFrames,data.colorMap.size());
-  //*data.colorMap;
-  //data.colorMap
-
-  // printf("C2#: %d\n", g_color.cols * g_color.rows * g_color.channels());
-  // printf("C3: %d\n", sizeof(*g_color.data));
 
   memcpy(g_color.data, data.colorMap, data.colorMap.size());
-
-  
-  int key = cv::waitKey(1);
-
   CTestDataset seqImg;
-
-  cv::Mat scaledDepth;//(g_depth.rows * 2, g_depth.cols * 2, CV_16UC1);
-
-  //cv::resize(g_depth, scaledDepth, scaledDepth.size());
+  cv::Mat scaledDepth;
 
   g_calib->calib(g_color, g_depth, g_color, scaledDepth);
   
-  //  cv::GaussianBlur(scaledDepth,scaledDepth, cv::Size(21,21),0);
-
-  //  std::cout << g_depth.size() << std::endl;
   seqImg.img.push_back(&g_color);
   seqImg.img.push_back(&scaledDepth);
 
@@ -111,6 +95,8 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
 
   detectR = g_forest->detection(seqImg);
 
+  int key = cv::waitKey(1);
+  
   if(key == 't'){
 
     stringstream ss_c, ss_d;
@@ -149,20 +135,11 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data){
        }
   }
 
-  
-
-  //   std::cout << g_depth.size() << std::endl;
-
-
-
   cv::Mat showDepth;
   scaledDepth.convertTo(showDepth, CV_8UC1, 255.0 / (MAX_DEPTH));
 
-  //  cv::circle(showDepth, cv::Point(320, 240), 5, cv::Scalar(0,0,0), 5);
-
   cv::imshow("color", g_color);
   cv::imshow("depth", showDepth);
-  
 
   key = cv::waitKey(1);
 
@@ -175,89 +152,10 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
   printf("Z#%u: %d\n",g_dFrames,data.vertices.size());
 
-  // // Project some 3D points in the Color Frame
-  // if (!g_pProjHelper)
-  // {
-  //     g_pProjHelper = new ProjectionHelper (data.stereoCameraParameters);
-  //     g_scp = data.stereoCameraParameters;
-  // }
-  // else if (g_scp != data.stereoCameraParameters)
-  // {
-  //     g_pProjHelper->setStereoCameraParameters(data.stereoCameraParameters);
-  //     g_scp = data.stereoCameraParameters;
-  // }
-
-  // int32_t w, h;
-  // FrameFormat_toResolution(data.captureConfiguration.frameFormat,&w,&h);
-  // int cx = w/2;
-  // int cy = h/2;
-
-  // printf("%d, %d\n", w, h);
-  // printf("%d", data.depthMap.size());
-
-  // Vertex p3DPoints[4];
-
-  // p3DPoints[0] = data.vertices[(cy-h/4)*w+cx-w/4];
-  // p3DPoints[1] = data.vertices[(cy-h/4)*w+cx+w/4];
-  // p3DPoints[2] = data.vertices[(cy+h/4)*w+cx+w/4];
-  // p3DPoints[3] = data.vertices[(cy+h/4)*w+cx-w/4];
-    
-  // Point2D p2DPoints[4];
-  // g_pProjHelper->get2DCoordinates ( p3DPoints, p2DPoints, 4, CAMERA_PLANE_COLOR);
-  // for(int i = 0; i < 4; ++i){
-  //   printf("p2DPoints[%d] = %d , %d\n", i , p2DPoints[i].x, p2DPoints[i].y);
-  // }
   g_dFrames++;
 
-  //  printf("Z2#: %d\n", g_depth.cols * g_depth.rows * g_depth.channels());
-  //printf("C3: %d\n", sizeof(*g_color.data));
-
   memcpy(g_depth.data, data.depthMap, data.depthMap.size()*2);
-  //cv::imshow("depth", g_depth);
-  //cv::waitKey(1);
-
-  // Quit the main loop after 200 depth frames received
-  //if (g_dFrames == 200)
-  //    g_context.quit();
 }
-
-/*----------------------------------------------------------------------------*/
-// void configureAudioNode()
-// {
-//     g_anode.newSampleReceivedEvent().connect(&onNewAudioSample);
-
-//     AudioNode::Configuration config = g_anode.getConfiguration();
-//     config.sampleRate = 44100;
-
-//     try 
-//     {
-//         g_context.requestControl(g_anode,0);
-
-//         g_anode.setConfiguration(config);
-        
-//         g_anode.setInputMixerLevel(0.5f);
-//     }
-//     catch (ArgumentException& e)
-//     {
-//         printf("Argument Exception: %s\n",e.what());
-//     }
-//     catch (UnauthorizedAccessException& e)
-//     {
-//         printf("Unauthorized Access Exception: %s\n",e.what());
-//     }
-//     catch (ConfigurationException& e)
-//     {
-//         printf("Configuration Exception: %s\n",e.what());
-//     }
-//     catch (StreamingException& e)
-//     {
-//         printf("Streaming Exception: %s\n",e.what());
-//     }
-//     catch (TimeoutException&)
-//     {
-//         printf("TimeoutException\n");
-//     }
-// }
 
 /*----------------------------------------------------------------------------*/
 void configureDepthNode()
@@ -382,17 +280,8 @@ void configureNode(Node node)
   cv::namedWindow("depth");
 
   cv::namedWindow("vote");
-  cv::namedWindow("hanabi2");
+  // cv::namedWindow("hanabi2");
 
-
-  //  cv::namedWindow("test");
-
-  // if ((node.is<AudioNode>())&&(!g_anode.isSet()))
-  // {
-  //     g_anode = node.as<AudioNode>();
-  //     configureAudioNode();
-  //     g_context.registerNode(node);
-  // }
 }
 
 /*----------------------------------------------------------------------------*/
@@ -464,15 +353,6 @@ int main(int argc, char* argv[])
 
   g_calib->loadParameters("intrinsics.yml", "extrinsics.yml");
 
-  //create tree direct
-  //string opath(conf.outpath);
-  //std::cout << "kokomade kitayo" << std::endl;
-  //std::cout << conf.outpath << std::endl;
-  //opath.erase(opath.find_last_of(PATH_SEP));
-  //string execstr = "mkdir ";
-  //execstr += opath;
-  //system( execstr.c_str() );
-
   g_context = Context::create("localhost");
 
   g_context.deviceAddedEvent().connect(&onDeviceConnected);
@@ -512,7 +392,6 @@ int main(int argc, char* argv[])
 
   if (g_cnode.isSet()) g_context.unregisterNode(g_cnode);
   if (g_dnode.isSet()) g_context.unregisterNode(g_dnode);
-  //if (g_anode.isSet()) g_context.unregisterNode(g_anode);
 
   printf("close nodes");
 

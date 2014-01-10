@@ -3,17 +3,17 @@
   <!-- Path to trees -->
   <treepath>./trees/treetable</treepath>
   <!-- Number of trees -->
-  <ntree>100</ntree>
+  <ntree>40</ntree>
 
   <!-- Patch width -->
-  <pwidth>30</pwidth>
+  <pwidth>50</pwidth>
   <!-- Patch height -->
-  <pheight>30</pheight>
+  <pheight>50</pheight>
 
   <!-- extract patch ratio -->
   <patchratio>10000</patchratio>
   <!-- Stride -->
-  <stride>10</stride>
+  <stride>15</stride>
   <!-- Train image per tree -->
   <trainimagepertree>59</trainimagepertree>
   <!-- min sample number -->
@@ -55,6 +55,9 @@
   <!-- Offset of tree-->
   <offtree>0</offtree>
   <classdatabasename>classDatabase</classdatabasename>
+
+  <poseestimatecircle>3</poseestimatecircle>
+  <showvote>0</showvote>
 
   <!--<mindistance>350</mindistance>-->
   <mindistance>0</mindistance>
